@@ -8,8 +8,8 @@
     "start:prod": "nodemon index.js",
     "pretest": "NODE_ENV=test npx sequelize-cli db: drop && NODE_ENV=test npx sequelize-cli db:create",
     "test": "NODE_ENV=test jest --detectOpenHandles",
-    "prepare": "husky install",
-    "build:tailwind" : "tailwindcss build public/css/input.css -o public/css/style.css"
+    "prepare": "husky install"
+  
   },
   "keywords": [],
   "lint-staged": {
