@@ -6,7 +6,7 @@ const sequelize = require("sequelize");
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.addColumn("Todos", "userId", {
-      type: Sequelize.DataTypes.INTEGER,
+      type: Sequelize.INTEGER,
     });
 
     await queryInterface.addConstraint("Todos", {
