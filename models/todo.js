@@ -1,5 +1,4 @@
 "use strict";
-const { Op } = require("sequelize");
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Todo extends Model {
@@ -11,68 +10,13 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
-    static async overdue() {
-      return await Todo.findAll({
-        where: {
-          dueDate: {
-            [Op.lt]: new Date(),
-          },
-          completed: false,
-        },
-        order: [["id", "ASC"]],
-      });
+
+    static addTodo({ title, dueDate }) {
+      return this.create({ title: title, dueDate: dueDate, completed: false });
     }
 
-    static async dueToday() {
-      return await Todo.findAll({
-        where: {
-          dueDate: {
-            [Op.eq]: new Date(),
-          },
-          completed: false,
-        },
-        order: [["id", "ASC"]],
-      });
-    }
-
-    static async dueLater() {
-      return await Todo.findAll({
-        where: {
-          dueDate: {
-            [Op.gt]: new Date(),
-          },
-          completed: false,
-        },
-        order: [["id", "ASC"]],
-      });
-    }
-    static async completed() {
-      return await Todo.findAll({
-        where: {
-          completed: true,
-        },
-        order: [["id", "ASC"]],
-      });
-    }
-
-    static async addTodo({ title, dueDate }) {
-      return await this.create({
-        title: title,
-        dueDate: dueDate,
-        completed: false,
-      });
-    }
-
-    static async remove(id) {
-      return await this.destroy({
-        where: {
-          id: id,
-        },
-      });
-    }
-
-    setCompletionStatus(status) {
-      return this.update({ completed: status });
+    markAsCompleted() {
+      return this.update({ completed: true });
     }
     static async getTodos() {
       return await this.findAll();
@@ -91,7 +35,6 @@ module.exports = (sequelize, DataTypes) => {
   );
   return Todo;
 };
-
 /* wd201 -10
 
 "use strict";
