@@ -1,8 +1,16 @@
 const express = require("express");
+const csrf = require("csurf");
+// const csrf = require("tiny-csrf");
 const app = express();
 const { Todo } = require("./models");
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser("some_secret"));
+// app.use(csrf("123456789iamasecret987654321look", // secret -- must be 32 bits or chars in length
+// ["POST", "PUT", "DELETE"]));
+app.use(csrf({ cookie: true }));
 const path = require("path");
 
 app.set("view engine", "ejs");
@@ -10,11 +18,26 @@ app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", async function (request, response) {
-  const allTodos = await Todo.getTodos();
+  const overdueItems = await Todo.overdue();
+  const dueTodayItems = await Todo.dueToday();
+  const dueLaterItems = await Todo.dueLater();
+  const completedItems = await Todo.completed();
   if (request.accepts("html")) {
-    response.render("index", { allTodos });
+    response.render("index", {
+      overdueItems,
+      dueTodayItems,
+      dueLaterItems,
+      completedItems,
+      csrfToken: request.csrfToken(),
+    });
   } else {
-    response.json(allTodos);
+    response.json({
+      overdueItems,
+      dueTodayItems,
+      dueLaterItems,
+      completedItems,
+      csrfToken: request.csrfToken(),
+    });
   }
 });
 
@@ -28,7 +51,6 @@ app.get("/todos", async function (_request, response) {
     return response.status(422).json(error);
   }
 });
-
 app.get("/todos/:id", async function (request, response) {
   try {
     const todo = await Todo.findByPk(request.params.id);
@@ -41,18 +63,20 @@ app.get("/todos/:id", async function (request, response) {
 
 app.post("/todos", async function (request, response) {
   try {
-    const todo = await Todo.addTodo(request.body);
-    return response.json(todo);
+    await Todo.addTodo({
+      title: request.body.title,
+      dueDate: request.body.dueDate,
+    });
+    return response.redirect("/");
   } catch (error) {
     console.log(error);
     return response.status(422).json(error);
   }
 });
-
-app.put("/todos/:id/markAsCompleted", async function (request, response) {
+app.put("/todos/:id/", async function (request, response) {
   const todo = await Todo.findByPk(request.params.id);
   try {
-    const updatedTodo = await todo.markAsCompleted();
+    const updatedTodo = await todo.setCompletionStatus(request.body.completed);
     return response.json(updatedTodo);
   } catch (error) {
     console.log(error);
@@ -61,30 +85,15 @@ app.put("/todos/:id/markAsCompleted", async function (request, response) {
 });
 
 app.delete("/todos/:id", async function (request, response) {
-  console.log("We have to delete a Todo with ID: ", request.params.id);
+  console.log("Deleting a Todo with ID: ", request.params.id);
   try {
-    // check if todo exists for given id
-    let deleted = false;
-    const todo = await Todo.findByPk(request.params.id);
-    if (todo) {
-      // Delete the todo with the given index
-      await Todo.destroy({
-        where: { id: request.params.id },
-      });
-      // Check the database any todo with given id is present
-      const stillThere = await Todo.findByPk(request.params.id);
-      // if todo is present, deletion failed so return false else return true
-      deleted = stillThere ? false : true;
-    } else {
-      deleted = false;
-    }
-    return response.send(deleted);
+    await Todo.remove(request.params.id);
+    return response.json({ success: true });
   } catch (error) {
     console.log(error);
     return response.status(422).json(error);
   }
 });
-
 module.exports = app;
 
 /* wd201 -10
