@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         order: [["id", "ASC"]],
       });
     }
+
     static async dueToday() {
       return await Todo.findAll({
         where: {
@@ -33,6 +34,7 @@ module.exports = (sequelize, DataTypes) => {
         order: [["id", "ASC"]],
       });
     }
+
     static async dueLater() {
       return await Todo.findAll({
         where: {
@@ -52,6 +54,7 @@ module.exports = (sequelize, DataTypes) => {
         order: [["id", "ASC"]],
       });
     }
+
     static async addTodo({ title, dueDate }) {
       return await this.create({
         title: title,
@@ -59,6 +62,7 @@ module.exports = (sequelize, DataTypes) => {
         completed: false,
       });
     }
+
     static async remove(id) {
       return await this.destroy({
         where: {

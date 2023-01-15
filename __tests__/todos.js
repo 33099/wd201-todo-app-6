@@ -43,7 +43,6 @@ describe("Todo Application", function () {
       completed: false,
       _csrf: csrfToken,
     });
-
     // the above added todo is second in the list of newly added todos
     const todoID = await agent.get("/todos").then((response) => {
       const parsedResponse = JSON.parse(response.text);
@@ -55,6 +54,7 @@ describe("Todo Application", function () {
       .send({ completed: true, _csrf: csrfToken });
     const parsedUpdateResponse = JSON.parse(setCompletionResponse.text);
     expect(parsedUpdateResponse.completed).toBe(true);
+
     // Testing for true to false
     const setCompletionResponse2 = await agent
       .put(`/todos/${todoID}`)
@@ -84,6 +84,7 @@ describe("Todo Application", function () {
     expect(parsedResponse.length).toBe(4);
     expect(parsedResponse[3]["title"]).toBe("Buy ps3");
   });
+
   // testing the deletion of a todo
   test("testimg the delete endpoint", async () => {
     const res = await agent.get("/");
@@ -99,6 +100,7 @@ describe("Todo Application", function () {
       const parsedResponse = JSON.parse(response.text);
       return parsedResponse[4]["id"];
     });
+
     const deleteResponse = await agent
       .delete(`/todos/${todoID}`)
       .send({ _csrf: csrfToken });

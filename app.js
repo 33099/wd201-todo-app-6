@@ -40,6 +40,7 @@ app.get("/", async function (request, response) {
     });
   }
 });
+
 app.get("/todos", async function (_request, response) {
   console.log("Processing list of all Todos ...");
   try {
@@ -82,6 +83,7 @@ app.put("/todos/:id/", async function (request, response) {
     return response.status(422).json(error);
   }
 });
+
 app.delete("/todos/:id", async function (request, response) {
   console.log("Deleting a Todo with ID: ", request.params.id);
   try {
