@@ -1,3 +1,7 @@
+<!-- wd201 -10 
+
+
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -16,6 +20,7 @@
         <%- include('header.ejs') %>
         <h6 class="py-4">Signup as a new user</h6>
         <form action="/users" method="post">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <div class="py-3">
                 <label for="firstName">First name</label>
                 <input name="firstName" type="text" class="rounded border-2 border-gray-500 p-2 w-full text-gray-900">
@@ -39,3 +44,6 @@
       </div>
     </div>
   </body>
+
+
+  till here wd201 -10 -->
